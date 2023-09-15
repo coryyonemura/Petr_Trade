@@ -11,9 +11,23 @@ all_login()
 home_screen()
 
 
-
-
-
+# while True:
+#     login()
+#     while True:
+#         if login:
+#             while True:
+#                 login()
+#                 while True:
+#
+#                 if back:
+#                     break
+#         elif signin:
+#             while True:
+#                 signin()
+#                 if back:
+#                     break
+#         elif back:
+#             break
 
 
 

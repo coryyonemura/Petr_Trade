@@ -2,7 +2,7 @@ import sqlite3
 
 class Petr_dbms:
     def __init__(self):
-        self._connection = sqlite3.connect("user_info.db")
+        self._connection = sqlite3.connect("users.db")
         self._cursor = self._connection.cursor()
         self._username = None
 
@@ -20,6 +20,19 @@ class Petr_dbms:
             return True
         except:
             print('the username is already taken, please choose a different username')
+            return False
+
+    def update_username(self, new_username):
+        try:
+            self._cursor.execute(
+                f'UPDATE users SET username = :new_username WHERE username = :old_username',
+                {'new_username': new_username, 'old_username': self._username}
+            )
+            self._connection.commit()
+            self._username = new_username
+            return True
+        except:
+            print('the username is already taken')
             return False
 
     def update_new_info(self, f_name: str, l_name: str, grade: str) -> None:
@@ -50,3 +63,32 @@ class Petr_dbms:
                 return True
         except:
             print('something went wrong')
+
+    def get_profile_info(self) ->list:
+        try:
+            self._cursor.execute(
+                'SELECT * FROM users WHERE username = :user_name',
+                {'user_name': self._username}
+            )
+            return self._cursor.fetchone()
+        except:
+            print("something went wrong")
+
+    def update_info(self, type_info, info):
+        self._cursor.execute(
+            f'UPDATE users SET {type_info} = :info WHERE username = :username',
+            {'info': info, 'username': self._username}
+        )
+        self._connection.commit()
+
+    def update_password(self, old_password, new_password):
+        try:
+            self._cursor.execute(
+                f'UPDATE users SET password = :new_password WHERE password = :old_password',
+                {'new_password': new_password, 'old_password': old_password}
+            )
+            self._connection.commit()
+            return True
+        except:
+            print('your old password is incorrect, please try again')
+            return False

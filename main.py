@@ -1,33 +1,19 @@
 from ui_functions import *
 
-def all_login():
-    if sign_in_screen() == 'l':
-        login()
-    else:
-        get_username_password()
-        get_more_info()
-
-all_login()
-home_screen()
-
-
-# while True:
-#     login()
-#     while True:
-#         if login:
-#             while True:
-#                 login()
-#                 while True:
-#
-#                 if back:
-#                     break
-#         elif signin:
-#             while True:
-#                 signin()
-#                 if back:
-#                     break
-#         elif back:
-#             break
-
-
+state = 1
+while True:
+    if state == 1:
+        state = sign_in_screen()
+    elif state == 2:
+        state = login()
+    elif state == 3:
+       state = sign_up()
+    elif state == 3.5:
+        state = get_more_info()
+    elif state == 4:
+        state = home_screen()
+    elif state == 5:
+        state = view_profile()
+    elif state == 5.5:
+        state = update_profile()
 

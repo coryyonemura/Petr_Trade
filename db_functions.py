@@ -6,7 +6,7 @@ class Petr_dbms:
         self._cursor = self._connection.cursor()
         self._username = None
 
-
+    #sign up functions
     def check_valid_username(self, username: str, password: str) -> bool:
         """checks the database to make sure that the username
         the user has chosen is not being used by anyone else, returns a bool accordingly"""
@@ -22,19 +22,6 @@ class Petr_dbms:
             print('the username is already taken, please choose a different username')
             return False
 
-    def update_username(self, new_username):
-        try:
-            self._cursor.execute(
-                f'UPDATE users SET username = :new_username WHERE username = :old_username',
-                {'new_username': new_username, 'old_username': self._username}
-            )
-            self._connection.commit()
-            self._username = new_username
-            return True
-        except:
-            print('the username is already taken')
-            return False
-
     def update_new_info(self, f_name: str, l_name: str, grade: str) -> None:
         """updates the database with the new information about the user after they create their account"""
         try:
@@ -46,6 +33,7 @@ class Petr_dbms:
         except:
             print('something went wrong')
 
+    # login functions
     def check_login_credentials(self, user_name: str, password: str) -> bool:
         """checks to see if the username and password is correct"""
         try:
@@ -64,7 +52,9 @@ class Petr_dbms:
         except:
             print('something went wrong')
 
+    #view/update profile functions
     def get_profile_info(self) ->list:
+        """retrieves all the profile information about a user"""
         try:
             self._cursor.execute(
                 'SELECT * FROM users WHERE username = :user_name',
@@ -74,14 +64,30 @@ class Petr_dbms:
         except:
             print("something went wrong")
 
-    def update_info(self, type_info, info):
+    def update_username(self, new_username)->bool:
+        """updates the username of a user"""
+        try:
+            self._cursor.execute(
+                f'UPDATE users SET username = :new_username WHERE username = :old_username',
+                {'new_username': new_username, 'old_username': self._username}
+            )
+            self._connection.commit()
+            self._username = new_username
+            return True
+        except:
+            print('the username is already taken, please try a new one')
+            return False
+
+    def update_info(self, type_info, info)->None:
+        """updates the info of a user depending on the parameter such as first_name, year, etc"""
         self._cursor.execute(
             f'UPDATE users SET {type_info} = :info WHERE username = :username',
             {'info': info, 'username': self._username}
         )
         self._connection.commit()
 
-    def update_password(self, old_password, new_password):
+    def update_password(self, old_password, new_password)->bool:
+        """updates the password of a user"""
         try:
             self._cursor.execute(
                 f'UPDATE users SET password = :new_password WHERE password = :old_password',

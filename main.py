@@ -1,5 +1,8 @@
 from ui_functions import *
-
+# from datetime import *
+#
+# print(datetime.now())
+# p()
 state = 1
 while True:
     if state == 1:
@@ -16,4 +19,7 @@ while True:
         state = view_profile()
     elif state == 5.5:
         state = update_profile()
-
+    elif state == 6:
+        state = trades_home_screen()
+    elif state == 6.2:
+        state = past_trades()

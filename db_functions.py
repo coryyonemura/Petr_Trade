@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import *
 
 class Petr_dbms:
     def __init__(self):
@@ -98,3 +99,17 @@ class Petr_dbms:
         except:
             print('your old password is incorrect, please try again')
             return False
+
+    def practice(self):
+        self._cursor.execute(
+            f'INSERT INTO past_trades (petr1, petr2, username1, username2, date_traded) VALUES (:petr1, :petr2, :username1, :username2, :date)',
+            {'petr1': 'spongebob', 'petr2': 'patrick', 'username1': 'cory', 'username2': 'coryy', 'date': datetime.now()}
+        )
+        self._connection.commit()
+
+    def get_past_trades(self):
+        self._cursor.execute(
+            f'SELECT * FROM past_trades WHERE username1 = :user1 OR username2 = :user2 ORDER BY date_traded DESC',
+            {'user1': self._username, 'user2': self._username}
+        )
+        return self._cursor.fetchall()

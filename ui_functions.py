@@ -55,15 +55,18 @@ def get_more_info() -> int:
 #homescreen functions
 def home_screen()->int:
     """simulates the home screen for the user"""
-    print("\nwhere would you like to go?")
-    print("type 'profile' to view and update your profile, type 'trades' to view the current trading board, or type logout' to logout")
-    choice = input("please enter your choice: ")
-    if choice == 'profile':
-        return 5
-    elif choice == 'logout':
-        print(f'goodbye {dbms._username}, see you again soon!')
-        print()
-        return 1
+    while True:
+        print("\nwhere would you like to go?")
+        print("type 'profile' to view and update your profile, type 'trades' to view the current trading board, or type logout' to logout")
+        choice = input("please enter your choice: ")
+        if choice == 'profile':
+            return 5
+        elif choice == 'trades':
+            return 6
+        elif choice == 'logout':
+            print(f'goodbye {dbms._username}, see you again soon!')
+            print()
+            return 1
 
 
 #view profile functions
@@ -141,3 +144,60 @@ def profile_update_password()->None:
         else:
             check = dbms.update_password(old_password, new_password)
     print('your password has been updated to '+'*'*len(new_password)+'!')
+
+
+#trades functions
+def trades_home_screen():
+    print()
+    while True:
+        choice = input("welcome to the trade hub!"
+                       "\nplease type 'past' to view past trades, "
+                       "\n'post' to post a trade,"
+                       "\n'view' to view the trading board,"
+                       "\n'pending' to view current trades you are involved in,"
+                       "\nor 'back' to go to the home screen: ")
+        if choice == 'back':
+            return 4
+        elif choice == 'past':
+            return 6.2
+        elif choice == 'post':
+            return 6.4
+        elif choice == 'pending':
+            return 6.6
+        elif choice == 'view':
+            return 6.8
+        print()
+
+def set_past_trade_data(data, position):
+    if data[position][2] == dbms._username:
+        return data[position][3], data[position][0], data[position][1]
+    else:
+        return data[position][2], data[position][1], data[position][0]
+
+def past_trades():
+    print()
+    print('here are your last five trades!')
+    data = dbms.get_past_trades()
+    for i in range(len(data)):
+        traded_with, traded_petr, traded_for = set_past_trade_data(data, i)
+
+        print(f'traded with: {traded_with}'
+              f'\ntraded petr: {traded_petr}'
+              f'\ntraded for: {traded_for}'
+              f'\ndate_traded: {data[i][4][0:11]}')
+
+        if (i%5 == 0 and i != 0) or i == (len(data)-1):
+            choice = input("type 'next' to view more trades or 'back' to go back: ")
+            if choice == 'back':
+                break
+            if choice == 'next' and i != len(data)-1:
+                pass
+            elif choice == 'next' and i == len(data)-1:
+                print('these are all the trades you have completed')
+                break
+        print()
+    return 6
+
+
+def p():
+    dbms.practice2()

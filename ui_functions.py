@@ -80,7 +80,7 @@ def view_profile()->int | float:
     print(f'last name: {info[3]}')
     print(f'graduation year: {info[4]}')
     print(f'petr? {info[5]}')
-    print(f'last trade date: {info[6]}')
+    print(f'last trade date: {info[6][0:11]}')
     print(f'favorite petr: {info[7]}')
 
     while True:
@@ -101,24 +101,20 @@ def update_profile()->int:
                        "\n'year' to change your graduation year,"
                        "\n'favorite_petr' to change your favorite petr,"
                        "\nor 'back' to go back: ")
-                       # "\nor 'save' to save your changes: ")
 
         if choice == 'first_name' or choice == 'last_name' or choice == 'year' or choice == 'favorite_petr':
             profile_update_choice(choice)
-
         elif choice == 'username':
             profile_update_username()
-
         elif choice == 'password':
             profile_update_password()
-
         elif choice == 'back':
             return 5
 
 def profile_update_choice(type_data)->None:
     """updates different information for the user"""
     data = input(f'Please enter your new {type_data}: ')
-    dbms.update_info(type_data, data.capitalize())
+    dbms.update_info('users', type_data, data.capitalize(), 'username', dbms._username)
     print(f'your {type_data} has been updated to {data}!')
 
 def profile_update_username()->None:
@@ -213,7 +209,7 @@ def post_trades()->int:
         return 6
     trading_with = input('what petr(s) are you trading with?: ')
     description = input('add a description of the trade: ')
-    dbms.post_trade(trade_for, trading_with, description)
+    dbms.insert_five('active_trades', 'petr','username','looking_for', 'description','date_posted', trading_with, dbms._username, trade_for, description, datetime.now())
     print('post was successful!')
     return 6.4
 
@@ -239,7 +235,7 @@ def accept_trade(trade)->None:
      else:
          print('you cannot trade with yourself')
 
-def view_trades()->int:
+def view_active_trades()->int:
     data = dbms.get_active_trades()
     print(f'\nwelcome! there are currently {len(data)} active trades to view!')
     for trade in data:
@@ -256,5 +252,97 @@ def view_trades()->int:
             accept_trade(trade)
         print()
     return 6
-def p():
-    dbms.practice()
+
+def view_pending_trades():
+    #types of trades: pending waiting to accept, waiting to be accepted, simply active
+    while True:
+        choice = input("\ntype 'active' to view your active trades, "
+                       "\ntype 'confirm' to view offers on your active trades, "
+                       "\ntype 'accepted' to view trades you are waiting to be accepted for, "
+                       "\nor type 'back' to go back: ")
+        if choice == 'back':
+            return 6
+        elif choice == 'active':
+            return 6.61
+        elif choice == 'confirm':
+            return 6.62
+        elif choice == 'accepted':
+            return 6.63
+
+def view_my_active_trades():
+    data = dbms.select_star_where('active_trades', 'username', dbms._username)
+    if len(data) == 0:
+        print('you have no active trades')
+        return 6.6
+    print(f'\nyou currently have {len(data)} active trades')
+    for trade in data:
+        print(f'user: {trade[1]}'
+              f'\noffered petrs: {trade[0]}'
+              f'\nlooking for: {trade[4]}'
+              f'\ndescription: {trade[3]}')
+        while True:
+            choice = input("type 'next' to view the next active trade, type 'delete' to delete the active trade, or type 'back' to go back: ")
+            if choice == 'next':
+                break
+            elif choice == 'back':
+                return 6.6
+            elif choice == 'delete':
+                dbms.delete_from_and('active_trades', 'petr', 'username', trade[0], dbms._username)
+                print('active trade successfully deleted!')
+                break
+        print()
+    print('these are all of your active trades')
+    return 6.6
+def view_need_confirm_trades():
+    data = dbms.select_star_where('pending_trades', 'posted_user', dbms._username)
+    if len(data) == 0:
+        print('you have no active trades')
+        return 6.6
+    print(f'\nyou currently have {len(data)} trades waiting to be confirmed')
+    for trade in data:
+        print(f'your offer: {trade[1]}'
+              f'\nyour looking for: {trade[2]}'
+              f'\ntrade partner: {trade[4]}'
+              f'\ntheir offer: {trade[5]}')
+        while True:
+            choice = input("type 'next' to view the next trade, type 'accept' to accept the offer, type 'deny' to reject a trade, or type 'back' to go back to the pending home page: ")
+            if choice == 'back':
+                return 6.6
+            elif choice == 'next':
+                break
+            elif choice == 'deny':
+                dbms.delete_from_and('pending_trades', 'posted_user', 'offered_petr', trade[0], trade[1])
+            elif choice == 'accept':
+                traded_with = input('please enter the final petr you traded: ')
+                traded_for = input('please enter the final petr you traded for: ')
+                dbms.finalize_trade(trade, traded_with, traded_for)
+                print('trade is a success! make sure to meet up and finalize the trade!')
+                break
+        print()
+    print('there are no more confirm trades')
+    return 6.6
+def view_my_active_trades_accepted():
+    data = dbms.select_star_where('pending_trades', 'user2', dbms._username)
+    if len(data) == 0:
+        print('you have no trades waiting to be accepted')
+        return 6.6
+    print(f'\nyou currently have {len(data)} trades waiting to be accepted')
+    for trade in data:
+        print(f'posted user: {trade[0]}'
+              f'\noffered petr: {trade[1]}'
+              f'\nlooking for: {trade[2]}'
+              f'\ndescription: {trade[3]}'
+              f'\nyour offer: {trade[5]}')
+        while True:
+            choice = input("type 'next' to view the next trade, type 'delete' to take back your offer, or type 'back' to go back to the pending home page: ")
+            if choice == 'back':
+                return 6.6
+            elif choice == 'next':
+                break
+            elif choice == 'delete':
+                dbms.delete_from_and('pending_trades', 'posted_user', 'offered_petr', trade[0], trade[1])
+                print('trade successfully deleted!')
+                break
+        print()
+    print('these are all of your trades waiting to be accepted')
+    return 6.6

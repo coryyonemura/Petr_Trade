@@ -1,6 +1,5 @@
 from ui_functions import *
 
-# p()
 state = 1
 while True:
     if state == 1:
@@ -23,5 +22,14 @@ while True:
         state = past_trades()
     elif state == 6.4:
         state = post_trades()
+    elif state == 6.6:
+        state = view_pending_trades()
+    elif state == 6.61:
+        state = view_my_active_trades()
+    elif state == 6.62:
+        state = view_need_confirm_trades()
+    elif state == 6.63:
+        state = view_my_active_trades_accepted()
     elif state == 6.8:
-        state = view_trades()
+        state = view_active_trades()
+

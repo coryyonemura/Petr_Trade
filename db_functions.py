@@ -103,13 +103,51 @@ class Petr_dbms:
     def practice(self):
         self._cursor.execute(
             f'INSERT INTO past_trades (petr1, petr2, username1, username2, date_traded) VALUES (:petr1, :petr2, :username1, :username2, :date)',
-            {'petr1': 'spongebob', 'petr2': 'patrick', 'username1': 'cory', 'username2': 'coryy', 'date': datetime.now()}
+            {'petr1': 'chicken', 'petr2': 'mo', 'username1': 'cory', 'username2': 'elise', 'date': datetime.now()}
         )
         self._connection.commit()
 
-    def get_past_trades(self):
+    def get_past_trades(self)->list:
+        """returns all the data for the user's past trades """
         self._cursor.execute(
             f'SELECT * FROM past_trades WHERE username1 = :user1 OR username2 = :user2 ORDER BY date_traded DESC',
             {'user1': self._username, 'user2': self._username}
         )
         return self._cursor.fetchall()
+
+    def post_trade(self, trade_for, trading_with, description)->None:
+        """posts the user's trade by updating the active_trades table"""
+        try:
+            self._cursor.execute(
+                f'INSERT INTO active_trades (petr, username, looking_for, description, date_posted)'
+                f'VALUES (:trading_with, :username, :looking_for, :description, :date_posted)',
+                {'trading_with': trading_with, 'username': self._username, 'looking_for': trade_for, 'description': description, 'date_posted': datetime.now()}
+            )
+            self._connection.commit()
+        except:
+            print('something went wrong')
+
+    def get_active_trades(self)->list:
+        """returns all active trades"""
+        try:
+            self._cursor.execute(
+                f'SELECT * FROM active_trades'
+            )
+            return self._cursor.fetchall()
+        except:
+            print('something went wrong')
+
+    def trade_offered(self, posted_user, offered_petr, looking_for, description, user2_description)->bool:
+        """updates the pending_trades table when a user initiates a trade"""
+        if posted_user == self._username:
+            return False
+        try:
+            self._cursor.execute(
+                f'INSERT INTO pending_trades (posted_user, offered_petr, looking_for, description, user2, user2_description, accepted)'
+                f'VALUES (:posted_user, :offered_petr, :looking_for, :description, :user2, :user2_description, :accepted)',
+                {'posted_user': posted_user, 'offered_petr': offered_petr, 'looking_for': looking_for, 'description':description, 'user2': self._username, 'user2_description': user2_description, 'accepted': 'Y'}
+            )
+            self._connection.commit()
+            return True
+        except:
+            print('something went wrong')

@@ -168,36 +168,93 @@ def trades_home_screen():
             return 6.8
         print()
 
-def set_past_trade_data(data, position):
+def get_past_trade_data(data: list, position: int):
+    """gets the data of the trades the user has participated in"""
     if data[position][2] == dbms._username:
         return data[position][3], data[position][0], data[position][1]
     else:
         return data[position][2], data[position][1], data[position][0]
 
-def past_trades():
-    print()
-    print('here are your last five trades!')
+def get_more_trades_option(position: int, len_data: int)->bool:
+    """checks to see whether the user wants to view more trades"""
+    while True:
+        choice = input("type 'next' to view more trades or 'back' to go back: ")
+        if choice == 'back':
+            return False
+        if choice == 'next' and position != len_data:
+            return True
+        elif choice == 'next' and position == len_data:
+            print('these are all the trades you have completed')
+            return False
+
+def past_trades()->int:
+    """displays the user's past trades in sets of five"""
+    print('\nhere are your last five trades!')
     data = dbms.get_past_trades()
     for i in range(len(data)):
-        traded_with, traded_petr, traded_for = set_past_trade_data(data, i)
+        traded_with, traded_petr, traded_for = get_past_trade_data(data, i)
 
-        print(f'traded with: {traded_with}'
+        print(f'\ntraded with: {traded_with}'
               f'\ntraded petr: {traded_petr}'
               f'\ntraded for: {traded_for}'
               f'\ndate_traded: {data[i][4][0:11]}')
 
-        if (i%5 == 0 and i != 0) or i == (len(data)-1):
-            choice = input("type 'next' to view more trades or 'back' to go back: ")
-            if choice == 'back':
-                break
-            if choice == 'next' and i != len(data)-1:
+        if ((i+1)%5 == 0 and i != 0) or i == (len(data)-1):
+            if get_more_trades_option(i, len(data)-1):
                 pass
-            elif choice == 'next' and i == len(data)-1:
-                print('these are all the trades you have completed')
+            else:
                 break
-        print()
     return 6
 
+def post_trades()->int:
+    """allows the user to post a trade"""
+    trade_for = input("\nwhat petr are you looking for? (or type 'back' to go back): ")
+    if trade_for == 'back':
+        return 6
+    trading_with = input('what petr(s) are you trading with?: ')
+    description = input('add a description of the trade: ')
+    dbms.post_trade(trade_for, trading_with, description)
+    print('post was successful!')
+    return 6.4
 
+def view_trade_choice()->int | str:
+    """checks to see if the user accepts the trade or wants to view the next trade"""
+    while True:
+        choice = input(
+            "type 'accept' to choose engage in this trade, 'next' to go to the next trade, or 'back' to go back to the trading hub: ")
+        if choice == 'back':
+            return 6
+        elif choice == 'next':
+            return 'next'
+        elif choice == 'accept':
+            return 'accept'
+
+def accept_trade(trade)->None:
+     """sends the accepted trade to the database"""
+     description = input("please explain the trade you are willing to offer: ")
+     success = dbms.trade_offered(trade[1], trade[0], trade[4], trade[3], description)
+     if success:
+         print(
+             f'great! your trade offer has been sent to {trade[1]}! this trade will now show up on your pending page')
+     else:
+         print('you cannot trade with yourself')
+
+def view_trades()->int:
+    data = dbms.get_active_trades()
+    print(f'\nwelcome! there are currently {len(data)} active trades to view!')
+    for trade in data:
+        print(f'user: {trade[1]}'
+              f'\noffered petrs: {trade[0]}'
+              f'\nlooking for: {trade[4]}'
+              f'\ndescription: {trade[3]}')
+        choice = view_trade_choice()
+        if choice == 6:
+            return choice
+        elif choice == 'next':
+            pass
+        else:
+            accept_trade(trade)
+        print()
+    return 6
 def p():
-    dbms.practice2()
+    dbms.practice()

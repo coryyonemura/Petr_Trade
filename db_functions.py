@@ -2,7 +2,7 @@ import sqlite3
 from datetime import *
 
 class Petr_dbms:
-    def __init__(self):
+    def __init__(self)->None:
         self._connection = sqlite3.connect("users.db")
         self._cursor = self._connection.cursor()
         self._username = None
@@ -33,6 +33,7 @@ class Petr_dbms:
             self._connection.commit()
         except:
             print('something went wrong')
+            raise SyntaxError
 
     # login functions
     def check_login_credentials(self, user_name: str, password: str) -> bool:
@@ -52,6 +53,7 @@ class Petr_dbms:
                 return True
         except:
             print('something went wrong')
+            raise SyntaxError
 
     #view/update profile functions
     def get_profile_info(self) ->list:
@@ -63,7 +65,8 @@ class Petr_dbms:
             )
             return self._cursor.fetchone()
         except:
-            print("something went wrong")
+            print('something went wrong')
+            raise SyntaxError
 
     def update_username(self, new_username)->bool:
         """updates the username of a user"""
@@ -101,7 +104,8 @@ class Petr_dbms:
         )
         return self._cursor.fetchall()
 
-    def insert_five(self, table, col1, col2, col3, col4, col5, col1_info, col2_info, col3_info, col4_info, col5_info):
+    def insert_five(self, table, col1, col2, col3, col4, col5, col1_info, col2_info, col3_info, col4_info, col5_info)->None:
+        """inserts five data elements into a table for five columns"""
         try:
             self._cursor.execute(
                 f'INSERT INTO {table} ({col1}, {col2}, {col3}, {col4}, {col5})'
@@ -111,6 +115,7 @@ class Petr_dbms:
             self._connection.commit()
         except:
             print('something went wrong')
+            raise SyntaxError
 
 
     def get_active_trades(self)->list:
@@ -122,6 +127,7 @@ class Petr_dbms:
             return self._cursor.fetchall()
         except:
             print('something went wrong')
+            raise SyntaxError
 
     def trade_offered(self, posted_user, offered_petr, looking_for, description, user2_description)->bool:
         """updates the pending_trades table when a user initiates a trade"""
@@ -137,8 +143,10 @@ class Petr_dbms:
             return True
         except:
             print('something went wrong')
+            raise SyntaxError
 
-    def delete_from_and(self, table_name, col1, col2, col1_info, col2_info):
+    def delete_from_and(self, table_name, col1, col2, col1_info, col2_info)->None:
+        """deletes from a specified table with specified column info"""
         try:
             self._cursor.execute(
                 f'DELETE FROM {table_name} WHERE {col1} = :c1_info AND {col2} = :c2_info',
@@ -147,7 +155,9 @@ class Petr_dbms:
             self._connection.commit()
         except:
             print('something went wrong')
-    def finalize_trade(self, trade, traded_with, traded_for):
+            raise SyntaxError
+    def finalize_trade(self, trade, traded_with, traded_for)->None:
+        """finalizes a trade by deleting it from pending_trades and adding it to past_trades table"""
         try:
             self.delete_from_and('pending_trades', 'posted_user', 'offered_petr', trade[0], trade[1])
             self.insert_five('past_trades', 'petr1','petr2','username1','username2','date_traded', traded_with, traded_for, trade[0],trade[4], datetime.now())
@@ -158,8 +168,11 @@ class Petr_dbms:
             self._connection.commit()
         except:
             print('something went wrong')
+            raise SyntaxError
 
-    def select_star_where(self, table_name, column_name, column_data):
+
+    def select_star_where(self, table_name, column_name, column_data)->list:
+        """a function that gets info from a specific table with a specific column name and info"""
         try:
             self._cursor.execute(
                 f'SELECT * FROM {table_name} WHERE {column_name} = :cd',
@@ -168,4 +181,5 @@ class Petr_dbms:
             return self._cursor.fetchall()
         except:
             print('something went wrong')
+            raise SyntaxError
 

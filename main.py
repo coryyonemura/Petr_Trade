@@ -1,6 +1,8 @@
 from ui_functions import *
 
 state = 1
+
+#main states loop
 while True:
     if state == 1:
         state = sign_in_screen()
